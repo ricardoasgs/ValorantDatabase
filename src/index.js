@@ -3,7 +3,6 @@ const client = new Discord.Client();
 
 const playerController = require("./playerController");
 const matchController = require("./matchController");
-const matchUserController = require("./matchUserController");
 
 require("dotenv").config();
 
@@ -16,10 +15,12 @@ client.on("message", async msg => {
   if (message[0] == "!player") {
     const player = message[1];
     const tag = message[2];
-    const user = playerController.index(player, tag);
+    const user = await playerController.index(player, tag);
 
-    const level = user.data.account_level
-    const nick = `${user.data.name} #${user.data.tag}`
+    console.log(user);
+
+    const level = user.account_level;
+    const nick = `${user.name} #${user.tag}`;
 
     const embed = new Discord.RichEmbed()
       .setTitle("User Info:")
@@ -30,23 +31,30 @@ client.on("message", async msg => {
   } else if(message[0] == "!match"){
     const player = message[1];
     const tag = message[2];
-    const matches = matchController.index(player, tag);
-
-    const matchId = matches.data[0].matchid;
-
-    const match = matchUserController.index(matchId);
+    const matches = await matchController.index(player, tag);
 
     const embed = new Discord.RichEmbed()
       .setTitle("Partida Atual:")
       .setColor(0xff0000);
-      await match.data.players.all_players.map(player=> {
-        embed.setDescription(`${player.name} - ${player.character} - ${player.currenttier_patched}`);
+      await matches.players.all_players.map(player=> {
+        embed.addField(`${player.name} - ${player.currenttier_patched}`, `${player.character}`, false);
+      })
+      
+
+    msg.channel.send(embed);
+  }else if(message[0] == "!."){
+    const matches = await matchController.index("Mika.Rega", "1997");
+
+    const embed = new Discord.RichEmbed()
+      .setTitle("Partida Atual:")
+      .setColor(0xff0000);
+      await matches.players.all_players.map(player=> {
+        embed.addField(`${player.name} - ${player.currenttier_patched}`, `${player.character}`, false);
       })
       
 
     msg.channel.send(embed);
   }
-  
   else {
     return;
   }

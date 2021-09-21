@@ -6,7 +6,7 @@ class matchController{
     const matches = await axios.get(
       `https://api.henrikdev.xyz/valorant/v3/matches/${region}/${player}/${tag}`
     );
-    return matches; 
+    return matches.data.data[0]; 
   }
 }
 

@@ -6,7 +6,7 @@ class matchController{
     const match = await axios.get(
       `https://api.henrikdev.xyz/valorant/v2/match/${matchId}`
     );
-    return match; 
+    return match.data.data; 
   }
 }
 
